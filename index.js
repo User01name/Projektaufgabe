@@ -12,12 +12,14 @@ app.set('view engine', 'ejs'); // set ejs as view engine
 
 //App Routen
 app.get("/", (req, res) => {
+
     res.render("pages/index"); // wir übergebne beim rendern der index.ejs Datei, den Array gespeichert in dem key "data"
 });                        
          
 app.get("/hostroom", (reg, res)=> {
     res.render("pages/hostroom");
 })
+
 
 //app start
 app.listen(port, () => {
