@@ -12,12 +12,7 @@ app.set('view engine', 'ejs'); // set ejs as view engine
 
 //App Routen
 app.get("/", (req, res) => {
-    const array = [                      //Array von Usern
-        {id: 1, username: "User01name", message: "MOin was geht!"}, 
-        {id: 2, username: "PrinzMarkus", message: "Ich bin reich"},
-        {id:3,username:"Nico", message: "Aaalles Klaaar"}
-    ];
-    res.render("pages/index", {data:array,}); // wir übergebne beim rendern der index.ejs Datei, den Array gespeichert in dem key "data"
+    res.render("pages/chessboard" ); 
 });                                  
 
 //app start
