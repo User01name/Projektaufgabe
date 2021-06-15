@@ -28,13 +28,19 @@
       </div>
       <div class="row justify-content-center">
         <div class="col-xs-12 col-sm-8"></div>
-          <button type="submit" id="confirm" onclick="clickFun()">Confirm</button>
+          <button type="submit" id="create" onclick="createChessboard()">Create Chessboard</button>
         </div>
         <div class="col-xs-12 col-sm-8"></div>
-          <button type="submit" id="confirm" onclick="exampleTurn()">Example Turn</button>
+          <button type="submit" id="exampleTurn" onclick="exampleTurn()">Example Turn</button>
         </div>  
+        <div class="col-xs-12 col-sm-8"></div>
+        <button type="submit" id="undo" onclick="undoSelection()">Undo Selection</button>
       </div>
+      <div class="col-xs-12 col-sm-8"></div>
+      <button type="submit" id="confirm" onclick="updateBoard()">Confirm Turn</button>
     </div>
+    </div>
+  </div>
 </body>
 
 </html>
