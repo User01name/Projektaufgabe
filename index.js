@@ -39,6 +39,9 @@ io.on('connection', function(socket){
       io.sockets.in(room).emit('message', msg); // nur an alle die in dem Raum sind wird die message über den message kanal geschickt
     });
 
+    socket.on('update', function(msg){
+      io.socket.in(room).emit('update',msg);
+    })
   
     socket.on('room', function(r){   // wenn von einem socket (Client) ein Raum über den room kanal kommt
       console.log('user joined room ' + r);
