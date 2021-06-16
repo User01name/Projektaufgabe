@@ -11,10 +11,15 @@ $(document).ready(() => {
 
         socket.emit('message', $('#m').val()); //verschicke eine Nachricht in den Message Kanal
         $('#m').val(''); //leeren des Inputfeldes
-      });
+    });
     //Wenn auf dem Message Kanal was kommt dann ...
     socket.on('message', function (msg) {
          $('#messages').append($('<li>').text(msg));
+    });
+    
+    //todo 
+    socket.on('update', function (msg) {
+        messageRecive(msg);
     });
 
     $('#roomForm').submit((event) => { //wenn der submit button des roomFormulars gedrückt wird ...
@@ -67,7 +72,7 @@ function paint() {
     }
     var chessboardDiv = document.getElementById('chessboard');
 
-    farbe = '#ccbf8e';
+    farbe = '#d1cb99';
 
     for (z = 0; z < 8; z++) {
 
@@ -81,8 +86,8 @@ function paint() {
             row += "</td>";
 
             if (s < 7) {
-                if (farbe == '#976344') { farbe = '#ccbf8e' }
-                else { farbe = '#976344'; }
+                if (farbe == '#383838') { farbe = '#d1cb99' }
+                else { farbe = '#383838'; }
             }
         }
 
@@ -224,14 +229,32 @@ function updateBoard(){
     if(chesspiecePreview){
         var idArrStartPos = tileId.split(",");
         var idArrEndPos = newTileId.split(",");
-        console.log("update Chessboard" + idArrStartPos +"->" +idArrEndPos)
+        console.log("update Chessboard" + idArrStartPos +"->" +idArrEndPos);
         chessboardArray[parseInt(idArrStartPos[0])][parseInt(idArrStartPos[1])] = "";
         chessboardArray[parseInt(idArrEndPos[0])] [parseInt(idArrEndPos[1])] = tileContent;
-        paint();
         undoSelection();
+        paint();
         chesspiecePreview = false;
+       // sendArray();       
     }
     
+}
+
+function sendArray(){
+    socket.emit('update', chessboardArray.toString()); //verschicke eine Nachricht in den Message Kanal
+}
+
+function messageRecive(msg){
+    console.log(msg);
+    if(msg.length === 0)
+    var stringArray = msg.split(",");
+    for(var i =0; i<stringArray.length;i+2){
+        for (let index = 0; index < chessboardArray.length; index++) {
+            chessboardArray [index][i] = stringArray[i];
+            chessboardArray [index][i+1] =stringArray[i+1];
+        }
+    }
+    paint();
 }
 
 function createChessboard() {
