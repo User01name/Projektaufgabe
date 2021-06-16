@@ -10,7 +10,14 @@
 
 <body>
     <div class="container">
-      <div class="row justify-content-center" id="room">
+      <!-- Raum und Message test-->
+      <div>
+        <ul id="messages"></ul>
+        <form action="" id="messageForm">
+          <h2>Messages</h2>
+          <div id="room"></div>
+          <input id="m" autocomplete="off" /><button>Send</button>
+        </form>
         <form action="" id="roomForm">
           <h2>Join another room: </h2>
           <input id="r" autocomplete="off" /><button>Join Room</button>
@@ -31,9 +38,6 @@
         <div class="col-xs-12 col-sm-8"></div>
           <button type="submit" id="create" onclick="createChessboard()">Create Chessboard</button>
         </div>
-        <div class="col-xs-12 col-sm-8"></div>
-          <button type="submit" id="exampleTurn" onclick="exampleTurn()">Example Turn</button>
-        </div>  
         <div class="col-xs-12 col-sm-8"></div>
         <button type="submit" id="undo" onclick="undoSelection()">Undo Selection</button>
       </div>
