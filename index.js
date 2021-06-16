@@ -20,7 +20,7 @@ app.get("/", function(req, res) {
 });     
 
 app.get("/hostroom", (reg, res)=> {
-    res.render(__dirname + "/views/pages/hostroom.ejs");
+    res.render("pages/hostroom");
 })
 
 //websocket on connection
