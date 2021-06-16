@@ -5,19 +5,31 @@ $(document).ready(() => {
     //Websocket:
     const socket = io();
     var roomDiv = document.getElementById('room');
+    
+    $('#messageForm').submit((event) => {
+        event.preventDefault();
+
+        socket.emit('message', $('#m').val()); //verschicke eine Nachricht in den Message Kanal
+        $('#m').val(''); //leeren des Inputfeldes
+      });
+    //Wenn auf dem Message Kanal was kommt dann ...
+    socket.on('message', function (msg) {
+         $('#messages').append($('<li>').text(msg));
+    });
 
     $('#roomForm').submit((event) => { //wenn der submit button des roomFormulars gedrückt wird ...
         event.preventDefault();
         socket.emit('room', $('#r').val()); // verschicke über den room Kanal eine Nachricht mit dem Inhalt des Textfeldes
-        roomDiv.innerHTML += `Room: ${$('#r').val()}`; // und Ändere den Raumnamen
+        $('#room').html($('<h3>').text(`Room: ${$('#r').val()}`)); // und Ändere den Raumnamen
         $('#r').val('');
     });
 
     socket.on('room', function (msg) { //wenn man eine Nachricht von dem room kanal bekommt ...
-        roomDiv.innerHTML += `Room: ${msg}`;//ändere den Text    
+        $('#room').html($('<h3>').text(`Room: ${$('#r').val()}`));//ändere den Text
+        $('#messages').empty();    
     });
-
 });
+
 //initialisieren des Spielbrettes
 const bauer = '<img src="/public/source/figuren/Bauerklein.png" alt="img" />';
 const turm = '<img src="/public/source/figuren/Turm.png" alt="img" />';
@@ -29,7 +41,6 @@ const koenig = '<img src="/public/source/figuren/Bauer.png" alt="img" />';
 const clickedOnFieldConst = 'clickedOnField(this)';
 
 var chessboardArray = new Array(8);
-var chessboardArrayCopy = chessboardArray;
 
 for (i = 0; i < chessboardArray.length; i++) {
     chessboardArray[i] = new Array(8);
@@ -37,8 +48,14 @@ for (i = 0; i < chessboardArray.length; i++) {
 
 function createStartArray() {
     for (i = 0; i < chessboardArray.length; i++) {
-        chessboardArray[1][i] = bauer;
-        chessboardArray[6][i] = bauer;
+        chessboardArray[0][i] = "";
+        chessboardArray[1][i] = "Bauer";
+        chessboardArray[2][i] = "";
+        chessboardArray[3][i] = "";
+        chessboardArray[4][i] = "";
+        chessboardArray[5][i] = "";
+        chessboardArray[6][i] = "Bauer";
+        chessboardArray[7][i] = "";
     }
     return chessboardArray;
 }
@@ -193,14 +210,28 @@ function repaint(chessboardArrayRow, chessboardArrayCol, endPosRow, endPosCol, f
     var rows = document.getElementById('chessboard').getElementsByTagName('tr');
     var data = rows[chessboardArrayRow].getElementsByTagName('td');
     data[chessboardArrayCol].innerHTML = "";
-
+   
+    //Array updaten
+    chessboardArray[chessboardArrayCol][chessboardArrayRow] = "";
+    chessboardArray[endPosRow] [endPosCol] =figur;
+    //
     data = rows[endPosRow].getElementsByTagName('td');
     data[endPosCol].innerHTML = figur;
     chesspiecePreview = true;
 }
 
 function updateBoard(){
-    //todo...
+    if(chesspiecePreview){
+        var idArrStartPos = tileId.split(",");
+        var idArrEndPos = newTileId.split(",");
+        console.log("update Chessboard" + idArrStartPos +"->" +idArrEndPos)
+        chessboardArray[parseInt(idArrStartPos[0])][parseInt(idArrStartPos[1])] = "";
+        chessboardArray[parseInt(idArrEndPos[0])] [parseInt(idArrEndPos[1])] = tileContent;
+        paint();
+        undoSelection();
+        chesspiecePreview = false;
+    }
+    
 }
 
 function createChessboard() {
@@ -209,13 +240,4 @@ function createChessboard() {
     chesspiecePreview = false;
     createStartArray();
     paint();
-}
-
-function exampleTurn() {
-    chessboardArray[1][1] = bauer;
-    chessboardArray[3][1] = bauer;
-    repaint(1, 1, 3, 1, bauer);
-    //      rows[i].addEventListener('click', function() {
-    //  alert(this.rowIndex + 1);
-    //});
 }

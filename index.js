@@ -33,13 +33,12 @@ io.on('connection', function(socket){
     socket.on('disconnect', function(){
       console.log('user disconnected');
     });
-    
-    /*
+
     socket.on('message', function(msg){
       console.log(`Message: ${msg} in Room: ${room}`);
       io.sockets.in(room).emit('message', msg); // nur an alle die in dem Raum sind wird die message über den message kanal geschickt
     });
-    */
+
   
     socket.on('room', function(r){   // wenn von einem socket (Client) ein Raum über den room kanal kommt
       console.log('user joined room ' + r);
