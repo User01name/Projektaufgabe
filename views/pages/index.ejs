@@ -3,6 +3,17 @@
 
 <head>
   <%- include('../partials/headers') %>
+  <script src="/public/script.js"></script>
+  <style>
+    body {
+      background: url("public/source/floor.jpg");
+    }
+    .container{
+      margin-top: 10%;
+      background-color:white;
+    }
+  </style>
+
 </head>
 
 <body>
@@ -20,9 +31,11 @@
               <input type="text" class="form-control" id="inputName" placeholder="Nickname">
               <label for="inputRoom">Copy room-id from the room you want to join</label>
               <input type="text" class="form-control" id="inputRoom" placeholder="Enter room-id">
-              <button type="submit" class="btn btn-primary" id="btn_join">Join Room!</button>
-              <button type="submit" class="btn btn-primary" id="btn_host">Host Game!</button>
-            </div>
+              <!-- <button type="submit" class="btn btn-primary" id="btn_join">Join Room!</button>-->
+             <a href="/chessboard"class="btn btn-link">Chessboard</a>
+              <!--<button type="submit" class="btn btn-primary" id="btn_host">Host Game!</button>
+           -->   
+           </div>
           </form>
         </div>
       </div>

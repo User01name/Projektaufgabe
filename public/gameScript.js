@@ -19,7 +19,7 @@ $(document).ready(() => {
 
 });
 //initialisieren des Spielbrettes
-const bauer = '<img src="/public/source/figuren/Bauer.png" alt="img" />';
+const bauer = '<img src="/public/source/figuren/Bauerklein.png" alt="img" />';
 const turm = '<img src="/public/source/figuren/Turm.png" alt="img" />';
 const laeufer = '<img src="/public/source/figuren/Bauer.png" alt="img" />';
 const springer = '<img src="/public/source/figuren/Bauer.png" alt="img" />';
@@ -37,8 +37,8 @@ for (i = 0; i < chessboardArray.length; i++) {
 
 function createStartArray() {
     for (i = 0; i < chessboardArray.length; i++) {
-        chessboardArray[1][i] = "Bauer";
-        chessboardArray[6][i] = "Bauer";
+        chessboardArray[1][i] = bauer;
+        chessboardArray[6][i] = bauer;
     }
     return chessboardArray;
 }
@@ -214,7 +214,7 @@ function createChessboard() {
 function exampleTurn() {
     chessboardArray[1][1] = bauer;
     chessboardArray[3][1] = bauer;
-    repaint(1, 1, 3, 1, "bauer");
+    repaint(1, 1, 3, 1, bauer);
     //      rows[i].addEventListener('click', function() {
     //  alert(this.rowIndex + 1);
     //});
