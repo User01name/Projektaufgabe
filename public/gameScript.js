@@ -1,3 +1,19 @@
+/* Zu erledigen:
+    - Siegbedingung (z.B. wenn ein bauer die andere Seite erreicht)
+    - Verschicken des Arrays über Websocket, sodass beide Spieler das gleiche sehen
+    - Verschiedene Spieler, verschiedene Arrays
+        --> z.B. über eine Datenbank auf dem Server mit einer Spalte für die Spielernummer 
+        und einer Nummer die bei einem Spieler initial 1 und bei dem anderen 2 ist 
+        --> es darf immer nur der Spiler mit der Nummer 1 ziehen, beim Zugende tauschen sich die Nummern   
+    - 2 Spielfigurenfarben --> zuordnung zu den Spielern und schmeißen nur möglich bei verschiedener Spielerfarbe
+    - Bilder anstatt Strings verwenden und ggf. größe der Bilder anpassen (element.textContent funktioniert glaub ich nicht --> vllt element.innerHTML?)
+*/
+
+/* zuletzt hinzugefügt:
+    -Baueraktionen (diagonal, 2 Felder nach vorn) --> nur für Bauern die unten starten
+    -Fehlerbehebung
+*/
+
 $(document).ready(() => {
     console.log("DOM is ready!");
 
@@ -122,11 +138,33 @@ function clickedOnField(element){
 
         switch (tileContent){
             case 'Bauer':
+                var countOfPossibleTurns = 0;
                 var idArr = tileId.split(",");
-                idArr [0] = parseInt(idArr[0]) -1; // Nur für den Spieler der unten ist sonst +1 todo...
 
-                idOfPossibleTurns[0] = (idArr[0] + "," + idArr[1]);
+                idArr [0] = parseInt(idArr[0]); // Nur für den Spieler der unten ist sonst +1 todo...
+
+                if(idArr [0] !== 0){
+                    idOfPossibleTurns [countOfPossibleTurns] = ((idArr[0]-1) + "," + idArr[1]);
+                 countOfPossibleTurns ++;
+                }
+                
+                // wenn der Bauer auf der Startlinie ist, kann er sich 2 Felder weit bewegen
+                if(idArr[0] === 6){
+                    idOfPossibleTurns [countOfPossibleTurns] = ((idArr[0]-2) + "," + idArr[1] );
+                    countOfPossibleTurns ++;
+                }
+                // wenn diagonal zum Bauer eine Figur ist, dann kann er diese schmeißen
+                if(chessboardArray[idArr[0]-1] [parseInt(idArr[1])+1] !== ""){
+                    idOfPossibleTurns [countOfPossibleTurns] = ((idArr[0]-1) + "," + (parseInt(idArr[1])+1));
+                    countOfPossibleTurns ++;
+                }
+                if(chessboardArray[idArr[0]-1] [parseInt(idArr[1])-1] !== ""){
+                    idOfPossibleTurns [countOfPossibleTurns] = ((idArr[0]-1) + "," + (parseInt(idArr[1])-1));
+                    countOfPossibleTurns ++;
+                }
+
                 for(var i = 0; i<idOfPossibleTurns.length; i++){
+                    console.log(idOfPossibleTurns.toString());
                     colorBeforePossibleTurns[i] = document.getElementById(idOfPossibleTurns[i]).getAttribute("bgcolor");
                     document.getElementById(idOfPossibleTurns[i]).setAttribute("bgcolor",colorOfPossibleTurn);
                 }
@@ -161,6 +199,11 @@ function undoSelection(){
     // zurücksetzen der bewegten Figur
         document.getElementById(tileId).textContent = tileContent;
         document.getElementById(newTileId).textContent = newTileExistingContent;
+    //zurücksetzen restlicher Variablen
+        tileId ="";
+        tileContent ="";
+        newTileId="";
+        newTileExistingContent="";
     }
 
 }
@@ -169,6 +212,10 @@ function check(chessboardArrayRow, chessboardArrayCol, endPosRow, endPosCol, fig
     if (chessboardArrayRow > 0 && chessboardArrayCol > 0 && endPosRow < 8 && endPosCol < 8) {
         if (figur == "Bauer") {
             if ((chessboardArrayRow - endPosRow) == 1 && chessboardArrayCol - endPosCol == 0) {
+                repaint(chessboardArrayRow, chessboardArrayCol, endPosRow, endPosCol, figur);
+            } else if((chessboardArrayRow - endPosRow) == 2 && chessboardArrayCol - endPosCol == 0 && chessboardArrayRow == 6){
+                repaint(chessboardArrayRow, chessboardArrayCol, endPosRow, endPosCol, figur);
+            } else if((chessboardArrayRow - endPosRow) == 1 && chessboardArrayCol - endPosCol == 1 ||(chessboardArrayRow - endPosRow) == 1 && chessboardArrayCol - endPosCol == -1){
                 repaint(chessboardArrayRow, chessboardArrayCol, endPosRow, endPosCol, figur);
             }
         }
@@ -216,10 +263,6 @@ function repaint(chessboardArrayRow, chessboardArrayCol, endPosRow, endPosCol, f
     var data = rows[chessboardArrayRow].getElementsByTagName('td');
     data[chessboardArrayCol].innerHTML = "";
    
-    //Array updaten
-    chessboardArray[chessboardArrayCol][chessboardArrayRow] = "";
-    chessboardArray[endPosRow] [endPosCol] =figur;
-    //
     data = rows[endPosRow].getElementsByTagName('td');
     data[endPosCol].innerHTML = figur;
     chesspiecePreview = true;
