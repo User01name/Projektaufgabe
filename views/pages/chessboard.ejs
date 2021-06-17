@@ -11,7 +11,22 @@
       background: url("public/source/floor.jpg");
     }
     .container{
-      background-color:white;
+      background-color:silver;
+    }
+    button{
+      background-color: gray;
+      border: none;
+  color: black;
+  padding: 10px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin-right: 10px;
+  margin-bottom: 5px;
+    }
+    #div_btn_section{
+      margin: 1%;
     }
   </style>
 </head>
@@ -42,15 +57,13 @@
             </tbody>
         </table>
       </div>
-      <div class="row justify-content-center">
-        <div class="col-xs-12 col-sm-8"></div>
-          <button type="submit" id="create" onclick="createChessboard()">Create Chessboard</button>
-        </div>
-        <div class="col-xs-12 col-sm-8"></div>
-        <button type="submit" id="undo" onclick="undoSelection()">Undo Selection</button>
-      </div>
-      <div class="col-xs-12 col-sm-8"></div>
-      <button type="submit" id="confirm" onclick="updateBoard()">Confirm Turn</button>
+      <div class="row justify-content-center" id="div_btn_section">
+       <!--<div class="col-xs-12 col-sm-8"></div>--> 
+          <button type="submit" id="create">Create Chessboard</button>
+        
+      <!--  <button type="submit" id="undo">Undo Selection</button>
+     -->
+      <button type="submit" id="confirm">Confirm Turn</button>
     </div>
     </div>
 
