@@ -1,6 +1,5 @@
 /* Zu erledigen:
     - Siegbedingung (z.B. wenn ein bauer die andere Seite erreicht)
-    - Verschicken des Arrays über Websocket, sodass beide Spieler das gleiche sehen
     - Verschiedene Spieler, verschiedene Arrays
         --> z.B. über eine Datenbank auf dem Server mit einer Spalte für die Spielernummer 
         und einer Nummer die bei einem Spieler initial 1 und bei dem anderen 2 ist 
@@ -10,7 +9,7 @@
 */
 
 /* zuletzt hinzugefügt:
-    -Baueraktionen (diagonal, 2 Felder nach vorn) --> nur für Bauern die unten starten
+    -Spielbrett wird bei allen im Raum synchronisiert;
     -Fehlerbehebung
 */
 
@@ -18,6 +17,7 @@ $(document).ready(() => {
     console.log("DOM is ready!");
 
     var chessboardArray = new Array(8);
+    var arrayIsCreated = false;
 
     //Websocket:
     const socket = io();
@@ -26,13 +26,25 @@ $(document).ready(() => {
 
     $('#messageForm').submit((event) => {
         event.preventDefault();
-
         socket.emit('message', $('#m').val()); //verschicke eine Nachricht in den Message Kanal
         $('#m').val(''); //leeren des Inputfeldes
     });
     //Wenn auf dem Message Kanal was kommt dann ...
     socket.on('message', function (msg) {
-        $('#messages').append($('<li>').text(msg));
+        var splitMsg = msg.split(",");
+        if(splitMsg [0] === "q1e3tuo2üa5dgj4lä6yc89m" && splitMsg.length === 65){
+            createChessboard();
+            var splitMsgCounter = 1;
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    chessboardArray[row][col] = splitMsg[splitMsgCounter];
+                    splitMsgCounter ++;
+                } 
+            }
+            paint();      
+        } else {
+            $('#messages').append($('<p>').text("-" + msg));
+        }
     });
 
     $('#roomForm').submit((event) => { //wenn der submit button des roomFormulars gedrückt wird ...
@@ -43,27 +55,19 @@ $(document).ready(() => {
     });
 
     socket.on('room', function (msg) { //wenn man eine Nachricht von dem room kanal bekommt ...
-        $('#room').html($('<h3>').text(`Room: ${$('#r').val()}`));//ändere den Text
+        $('#room').html($('<h3>').text("Room: " + msg));//ändere den Text
         $('#messages').empty();
+        $('#messages').append($('<h2>').text("Chat"));
     });
 
-
-
-
-    //todo 
-    /*  socket.on('update', function (msg) {
-         var message = messageRecive(msg);
-         console.log(message);
-         //chessboardArray
-     });
-     socket.on('update', function (msg) { //wenn man eine Nachricht von dem room kanal bekommt ...
-         var ne = msg;// $('#room').html($('<h3>').text(`Room: ${$('#r').val()}`));//ändere den Text
-         $('#messages').empty();
-         //updateBoard
-     }); */
     function sendArray() {
-
-        socket.emit('update', chessboardArray.toString()); //verschicke eine Nachricht in den Message Kanal
+        var arrayAsString = "q1e3tuo2üa5dgj4lä6yc89m";
+        for(let row = 0; row < chessboardArray.length; row++){
+            for (let col = 0; col < chessboardArray.length; col++) {
+                 arrayAsString += ("," + chessboardArray[row][col]);
+            }          
+        }
+        socket.emit('message', arrayAsString); //verschicke eine Nachricht in den Message Kanal
     }
 
     //initialisieren des Spielbrettes
@@ -83,6 +87,7 @@ $(document).ready(() => {
     }
 
     function createStartArray() {
+        arrayIsCreated = true;
         for (i = 0; i < chessboardArray.length; i++) {
             chessboardArray[0][i] = "";
             chessboardArray[1][i] = "Bauer";
@@ -189,7 +194,6 @@ $(document).ready(() => {
                     }
 
                     for (var i = 0; i < idOfPossibleTurns.length; i++) {
-                        console.log(idOfPossibleTurns.toString());
                         colorBeforePossibleTurns[i] = document.getElementById(idOfPossibleTurns[i]).getAttribute("bgcolor");
                         document.getElementById(idOfPossibleTurns[i]).setAttribute("bgcolor", colorOfPossibleTurn);
                     }
@@ -303,7 +307,6 @@ $(document).ready(() => {
         if (chesspiecePreview) {
             var idArrStartPos = tileId.split(",");
             var idArrEndPos = newTileId.split(",");
-            console.log("update Chessboard" + idArrStartPos + "->" + idArrEndPos);
             chessboardArray[parseInt(idArrStartPos[0])][parseInt(idArrStartPos[1])] = "";
             chessboardArray[parseInt(idArrEndPos[0])][parseInt(idArrEndPos[1])] = tileContent;
             undoSelection();
@@ -314,20 +317,6 @@ $(document).ready(() => {
 
     }
 
-
-
-    function messageRecive(msg) {
-        console.log(msg);
-        if (msg.length === 0)
-            var stringArray = msg.split(",");
-        for (var i = 0; i < stringArray.length; i + 2) {
-            for (let index = 0; index < chessboardArray.length; index++) {
-                chessboardArray[index][i] = stringArray[i];
-                chessboardArray[index][i + 1] = stringArray[i + 1];
-            }
-        }
-        paint();
-    }
     $("#create").click(function () {
         createChessboard();
     });
@@ -341,11 +330,11 @@ $(document).ready(() => {
     });
  function checkVictory(){
     for (i = 0; i < chessboardArray.length; i++) {
-       if(chessboardArray[0][i] != ""){
+       if(chessboardArray[0][i] != "" && chessboardArray[0][i]!==undefined){
            window.alert("Du hast gewonnen");
            console.log("Du hast gewonnen");
        }
-       if(chessboardArray[7][i] != ""){
+       if(chessboardArray[7][i] != "" && chessboardArray[0][i]!==undefined){
         window.alert("Du hast verloren");
         console.log("Du hast verloren");
     }

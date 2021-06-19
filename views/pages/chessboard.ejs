@@ -34,17 +34,22 @@
 <body>
     <div class="container">
       <!-- Raum und Message test-->
-      <div>
-        <ul id="messages"></ul>
-        <form action="" id="messageForm">
-          <h2>Messages</h2>
-          <div id="room"></div>
-          <input id="m" autocomplete="off" /><button>Send</button>
-        </form>
-        <form action="" id="roomForm">
-          <h2>Join another room: </h2>
-          <input id="r" autocomplete="off" /><button>Join Room</button>
-        </form>
+      <div class="row justify-content-center">
+        
+        <div class="col-xs-2 col-sm-8">
+          <form action="" id="messageForm">
+            <h2>Messages</h2>
+            <div id="room"></div>
+            <input id="m" autocomplete="off" /><button>Send Message</button>
+          </form>
+          <form action="" id="roomForm">
+            <h2>Join another room: </h2>
+           <input id="r" autocomplete="off" /><button>Join Room</button>
+          </form>
+        </div>
+        <div class="col-xs-2 col-sm-4" id="messages" style="background-color: beige; height: 230px;overflow-x: hidden;overflow-y: auto;" >
+          <h2>Chat</h2>
+        </div>
       </div>
       <div class="row justify-content-center">
         <div class="col-xs-12 col-sm-8">
@@ -71,3 +76,9 @@
 </body>
 
 </html>
+
+<!-- width: 600px;
+  height: 150px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  text-align: center;-->
