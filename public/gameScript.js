@@ -15,7 +15,7 @@
 
 $(document).ready(() => {
     console.log("DOM is ready!");
-
+    var host = false;
     var chessboardArray = new Array(8);
     var arrayIsCreated = false;
 
@@ -23,6 +23,7 @@ $(document).ready(() => {
     const socket = io();
     var roomDiv = document.getElementById('room');
     var arrayTransport = document.getElementById('array');
+
 
     $('#messageForm').submit((event) => {
         event.preventDefault();
@@ -32,20 +33,33 @@ $(document).ready(() => {
     //Wenn auf dem Message Kanal was kommt dann ...
     socket.on('message', function (msg) {
         var splitMsg = msg.split(",");
-        if(splitMsg [0] === "q1e3tuo2üa5dgj4lä6yc89m" && splitMsg.length === 65){
+
+
+        if (splitMsg[1] === "q1e3tuo2üa5dgj4lä6yc89m" && splitMsg.length === 66) {
             createChessboard();
-            var splitMsgCounter = 1;
+            var splitMsgCounter = 2;
             for (let row = 0; row < 8; row++) {
                 for (let col = 0; col < 8; col++) {
                     chessboardArray[row][col] = splitMsg[splitMsgCounter];
-                    splitMsgCounter ++;
-                } 
+                    splitMsgCounter++;
+                }
             }
-            paint();      
+            if (splitMsg[0] === "h"&& host == false) {
+                reverseArray();
+            }
+
+            if (splitMsg[0] === "m"&& host == true) {
+                reverseArray();
+            }
+            paint();
         } else {
             $('#messages').append($('<p>').text("-" + msg));
         }
     });
+
+    function reverseArray() {
+        chessboardArray = chessboardArray.reverse();
+    }
 
     $('#roomForm').submit((event) => { //wenn der submit button des roomFormulars gedrückt wird ...
         event.preventDefault();
@@ -60,23 +74,50 @@ $(document).ready(() => {
         $('#messages').append($('<h2>').text("Chat"));
     });
 
+    $("#create").click(function () {
+        createChessboard();
+        host = true;
+        sendArray();
+    });
+    $("#undo").click(function () {
+        undoSelection();
+    });
+    $("#confirm").click(function () {
+        updateBoard();
+        checkVictory();
+        sendArray();
+    });
     function sendArray() {
-        var arrayAsString = "q1e3tuo2üa5dgj4lä6yc89m";
-        for(let row = 0; row < chessboardArray.length; row++){
+        var arrayAsString = "";
+        if (host) {
+            arrayAsString += "h,"
+        }
+        else {
+            arrayAsString += "m,"
+        }
+        arrayAsString += "q1e3tuo2üa5dgj4lä6yc89m";
+        for (let row = 0; row < chessboardArray.length; row++) {
             for (let col = 0; col < chessboardArray.length; col++) {
-                 arrayAsString += ("," + chessboardArray[row][col]);
-            }          
+                arrayAsString += ("," + chessboardArray[row][col]);
+            }
         }
         socket.emit('message', arrayAsString); //verschicke eine Nachricht in den Message Kanal
     }
 
     //initialisieren des Spielbrettes
-    const bauer = '<img src="/public/source/figuren/BauerW.png" alt="img" />';
+    const bauerh = '<img class="bauerh" src="/public/source/figuren/BauerW.png" alt="img" />';
     const turm = '<img src="/public/source/figuren/Turm.png" alt="img" />';
     const laeufer = '<img src="/public/source/figuren/Bauer.png" alt="img" />';
     const springer = '<img src="/public/source/figuren/Bauer.png" alt="img" />';
     const koenigin = '<img src="/public/source/figuren/Bauer.png" alt="img" />';
     const koenig = '<img src="/public/source/figuren/Bauer.png" alt="img" />';
+
+    const bauerm = '<img class="bauerm" src="/public/source/figuren/BauerWm.png" alt="img" />';
+  //  const turm = '<img src="/public/source/figuren/Turm.png" alt="img" />';
+   // const laeufer = '<img src="/public/source/figuren/Bauer.png" alt="img" />';
+   // const springer = '<img src="/public/source/figuren/Bauer.png" alt="img" />';
+   // const koenigin = '<img src="/public/source/figuren/Bauer.png" alt="img" />';
+   // const koenig = '<img src="/public/source/figuren/Bauer.png" alt="img" />';
 
     const clickedOnFieldConst = 'clickedOnField(this)';
 
@@ -90,14 +131,15 @@ $(document).ready(() => {
         arrayIsCreated = true;
         for (i = 0; i < chessboardArray.length; i++) {
             chessboardArray[0][i] = "";
-            chessboardArray[1][i] = "Bauer";
+            chessboardArray[1][i] = "Bauer";  // bauerm;
             chessboardArray[2][i] = "";
             chessboardArray[3][i] = "";
             chessboardArray[4][i] = "";
             chessboardArray[5][i] = "";
-            chessboardArray[6][i] = "Bauer";
+            chessboardArray[6][i] = "Bauer"  // bauerh;
             chessboardArray[7][i] = "";
         }
+        //   $("#create").disabled = true;
         return chessboardArray;
     }
 
@@ -146,28 +188,36 @@ $(document).ready(() => {
     var newTileExistingContent;
     var selectedId;
 
+
+    $("#chessboard").on("click", "img", function () { /// jqery befehl für den click
+var element = $(this);
+element = element.parent();
+        var id = element.attr('id');
+      //  clickedOnField(element);
+       clickedOnField(document.getElementById(id));
+    });
     $("#chessboard").on("click", "td", function () { /// jqery befehl für den click
 
         var id = $(this).attr('id');
-        clickedOnField(document.getElementById(id));
+      clickedOnField(document.getElementById(id));
     });
 
     function clickedOnField(element) {
 
-        if (!chesspieceSelected && (element.textContent !== "")) {
+        if (!chesspieceSelected && (element.nodeName == "TD")) {
             selectedId = element.getAttribute("id");
             const colorSelectedField = '#7CC7FF';
             const colorOfPossibleTurn = '#7CC752';
 
             tileId = element.id;
             tileColor = element.getAttribute("bgcolor");
-            tileContent = element.textContent
+            tileContent =  element.textContent;  // element.firstChild.className
 
             document.getElementById(tileId).setAttribute("bgcolor", colorSelectedField);
             chesspieceSelected = true;
 
             switch (tileContent) {
-                case 'Bauer':
+                case 'Bauer':             //  case 'bauerh':
                     var countOfPossibleTurns = 0;
                     var idArr = tileId.split(",");
 
@@ -317,31 +367,21 @@ $(document).ready(() => {
 
     }
 
-    $("#create").click(function () {
-        createChessboard();
-    });
-    $("#undo").click(function () {
-        undoSelection();
-    });
-    $("#confirm").click(function () {
-        updateBoard();
-        checkVictory();
-        sendArray();
-    });
- function checkVictory(){
-    for (i = 0; i < chessboardArray.length; i++) {
-       if(chessboardArray[0][i] != "" && chessboardArray[0][i]!==undefined){
-           window.alert("Du hast gewonnen");
-           console.log("Du hast gewonnen");
-       }
-       if(chessboardArray[7][i] != "" && chessboardArray[0][i]!==undefined){
-        window.alert("Du hast verloren");
-        console.log("Du hast verloren");
+
+    function checkVictory() {
+        for (i = 0; i < chessboardArray.length; i++) {
+            if (chessboardArray[0][i] != "" && chessboardArray[0][i] !== undefined) {
+                window.alert("Du hast gewonnen");
+                console.log("Du hast gewonnen");
+            }
+            if (chessboardArray[7][i] != "" && chessboardArray[0][i] !== undefined) {
+                window.alert("Du hast verloren");
+                console.log("Du hast verloren");
+            }
+            //   $('#create').disabled = false;
+
+        }
     }
-       
-        
-    }
- }
     function createChessboard() {
         //window.location = "/hostroom";
         chesspieceSelected = false;
