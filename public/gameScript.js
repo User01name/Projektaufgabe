@@ -133,12 +133,12 @@ $(document).ready(() => {
         arrayIsCreated = true;
         for (i = 0; i < chessboardArray.length; i++) {
             chessboardArray[0][i] = "";
-            chessboardArray[1][i] = "Bauer";  // bauerm;
+            chessboardArray[1][i] =  bauerm;
             chessboardArray[2][i] = "";
             chessboardArray[3][i] = "";
             chessboardArray[4][i] = "";
             chessboardArray[5][i] = "";
-            chessboardArray[6][i] = "Bauer"  // bauerh;
+            chessboardArray[6][i] =  bauerh;
             chessboardArray[7][i] = "";
         }
         //   $("#create").disabled = true;
@@ -201,7 +201,7 @@ element = element.parent();
     $("#chessboard").on("click", "td", function () { /// jqery befehl für den click
 
         var id = $(this).attr('id');
-      clickedOnField(document.getElementById(id));
+     // clickedOnField(document.getElementById(id));
     });
 
     function clickedOnField(element) {
@@ -213,13 +213,13 @@ element = element.parent();
 
             tileId = element.id;
             tileColor = element.getAttribute("bgcolor");
-            tileContent =  element.textContent;  // element.firstChild.className
+            tileContent =  element.firstChild.className;
 
             document.getElementById(tileId).setAttribute("bgcolor", colorSelectedField);
             chesspieceSelected = true;
 
             switch (tileContent) {
-                case 'Bauer':             //  case 'bauerh':
+                case bauerh:
                     var countOfPossibleTurns = 0;
                     var idArr = tileId.split(",");
 
