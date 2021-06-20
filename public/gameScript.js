@@ -6,6 +6,8 @@
         --> es darf immer nur der Spiler mit der Nummer 1 ziehen, beim Zugende tauschen sich die Nummern   
     - 2 Spielfigurenfarben --> zuordnung zu den Spielern und schmeißen nur möglich bei verschiedener Spielerfarbe
     - Bilder anstatt Strings verwenden und ggf. größe der Bilder anpassen (element.textContent funktioniert glaub ich nicht --> vllt element.innerHTML?)
+    -Bauer darf nicht gerade schmeißen
+    -für Spieler 2 board an der y-Achse speigeln
 */
 
 /* zuletzt hinzugefügt:
@@ -204,7 +206,7 @@ element = element.parent();
 
     function clickedOnField(element) {
 
-        if (!chesspieceSelected && (element.nodeName == "TD")) {
+        if (!chesspieceSelected && (element.nodeName == "TD") && element.innerHTML != "") {
             selectedId = element.getAttribute("id");
             const colorSelectedField = '#7CC7FF';
             const colorOfPossibleTurn = '#7CC752';
@@ -222,6 +224,7 @@ element = element.parent();
                     var idArr = tileId.split(",");
 
                     idArr[0] = parseInt(idArr[0]); // Nur für den Spieler der unten ist sonst +1 todo...
+                    idArr[1] = parseInt(idArr[1]);
 
                     if (idArr[0] !== 0) {
                         idOfPossibleTurns[countOfPossibleTurns] = ((idArr[0] - 1) + "," + idArr[1]);
@@ -234,12 +237,12 @@ element = element.parent();
                         countOfPossibleTurns++;
                     }
                     // wenn diagonal zum Bauer eine Figur ist, dann kann er diese schmeißen
-                    if (chessboardArray[idArr[0] - 1][parseInt(idArr[1]) + 1] !== "") {
-                        idOfPossibleTurns[countOfPossibleTurns] = ((idArr[0] - 1) + "," + (parseInt(idArr[1]) + 1));
+                    if (chessboardArray[idArr[0] - 1][idArr[1] + 1] !== "" && idArr[1] !== 7) {
+                        idOfPossibleTurns[countOfPossibleTurns] = ((idArr[0] - 1) + "," + (idArr[1] + 1));
                         countOfPossibleTurns++;
                     }
-                    if (chessboardArray[idArr[0] - 1][parseInt(idArr[1]) - 1] !== "") {
-                        idOfPossibleTurns[countOfPossibleTurns] = ((idArr[0] - 1) + "," + (parseInt(idArr[1]) - 1));
+                    if (chessboardArray[idArr[0] - 1][idArr[1] - 1] !== "" && idArr[1] !== 0) {
+                        idOfPossibleTurns[countOfPossibleTurns] = ((idArr[0] - 1) + "," + (idArr[1] - 1));
                         countOfPossibleTurns++;
                     }
 
@@ -294,7 +297,7 @@ element = element.parent();
     }
 
     function check(chessboardArrayRow, chessboardArrayCol, endPosRow, endPosCol, figur) {
-        if (chessboardArrayRow > 0 && chessboardArrayCol > 0 && endPosRow < 8 && endPosCol < 8) {
+        if (chessboardArrayRow >= 0 && chessboardArrayCol >= 0 && endPosRow < 8 && endPosCol < 8) {
             if (figur == "Bauer") {
                 if ((chessboardArrayRow - endPosRow) == 1 && chessboardArrayCol - endPosCol == 0) {
                     repaint(chessboardArrayRow, chessboardArrayCol, endPosRow, endPosCol, figur);
