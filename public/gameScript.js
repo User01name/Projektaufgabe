@@ -219,7 +219,7 @@ element = element.parent();
             chesspieceSelected = true;
 
             switch (tileContent) {
-                case bauerh:
+                case 'bauerh':
                     var countOfPossibleTurns = 0;
                     var idArr = tileId.split(",");
 
@@ -298,7 +298,7 @@ element = element.parent();
 
     function check(chessboardArrayRow, chessboardArrayCol, endPosRow, endPosCol, figur) {
         if (chessboardArrayRow >= 0 && chessboardArrayCol >= 0 && endPosRow < 8 && endPosCol < 8) {
-            if (figur == "Bauer") {
+            if (figur =='bauerh') {
                 if ((chessboardArrayRow - endPosRow) == 1 && chessboardArrayCol - endPosCol == 0) {
                     repaint(chessboardArrayRow, chessboardArrayCol, endPosRow, endPosCol, figur);
                 } else if ((chessboardArrayRow - endPosRow) == 2 && chessboardArrayCol - endPosCol == 0 && chessboardArrayRow == 6) {
