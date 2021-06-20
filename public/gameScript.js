@@ -221,8 +221,7 @@ $(document).ready(() => {
             document.getElementById(tileId).setAttribute("bgcolor", colorSelectedField);
             chesspieceSelected = true;
 
-            switch (tileContent) {
-                case 'bauerh':
+                if(tileContent == 'bauerh' || tileContent == 'bauerm'){
                     var countOfPossibleTurns = 0;
                     var idArr = tileId.split(",");
 
@@ -253,10 +252,7 @@ $(document).ready(() => {
                         colorBeforePossibleTurns[i] = document.getElementById(idOfPossibleTurns[i]).getAttribute("bgcolor");
                         document.getElementById(idOfPossibleTurns[i]).setAttribute("bgcolor", colorOfPossibleTurn);
                     }
-                    break;
-                default:
-                    console.log("irgendwas ist schiefgleuafen bei clickedOnField()")
-            }
+                }
         } else if (chesspieceSelected) {
             if (!chesspiecePreview) {
                 newTileId = element.id;
@@ -288,10 +284,7 @@ $(document).ready(() => {
             chesspiecePreview = false;
             chesspieceSelected = false;
             // zurücksetzen der bewegten Figur
-            if (tileContent = 'bauerh') {
-                document.getElementById(tileId).textContent = bauerh;
-            }
-            document.getElementById(newTileId).textContent = newTileExistingContent;
+           paint();
             //zurücksetzen restlicher Variablen
             tileId = "";
             tileContent = "";
@@ -303,7 +296,7 @@ $(document).ready(() => {
 
     function check(chessboardArrayRow, chessboardArrayCol, endPosRow, endPosCol, figur) {
         if (chessboardArrayRow >= 0 && chessboardArrayCol >= 0 && endPosRow < 8 && endPosCol < 8) {
-            if (figur == 'bauerh') {
+            if (figur == 'bauerh' || 'bauerm') {
                 if ((chessboardArrayRow - endPosRow) == 1 && chessboardArrayCol - endPosCol == 0) {
                     repaint(chessboardArrayRow, chessboardArrayCol, endPosRow, endPosCol, figur);
                 } else if ((chessboardArrayRow - endPosRow) == 2 && chessboardArrayCol - endPosCol == 0 && chessboardArrayRow == 6) {
@@ -357,7 +350,8 @@ $(document).ready(() => {
         data[chessboardArrayCol].innerHTML = "";
 
         data = rows[endPosRow].getElementsByTagName('td');
-        data[endPosCol].innerHTML = figur;
+        var a = getImgFromString(figur);
+            data[endPosCol].innerHTML = a;
         chesspiecePreview = true;
     }
 
@@ -366,7 +360,9 @@ $(document).ready(() => {
             var idArrStartPos = tileId.split(",");
             var idArrEndPos = newTileId.split(",");
             chessboardArray[parseInt(idArrStartPos[0])][parseInt(idArrStartPos[1])] = "";
-            chessboardArray[parseInt(idArrEndPos[0])][parseInt(idArrEndPos[1])] = tileContent;
+            
+            var test = getImgFromString(tileContent);
+            chessboardArray[parseInt(idArrEndPos[0])][parseInt(idArrEndPos[1])] = test;
             undoSelection();
             paint();
             chesspiecePreview = false;
@@ -396,5 +392,14 @@ $(document).ready(() => {
         chesspiecePreview = false;
         createStartArray();
         paint();
+    }
+    function getImgFromString(name){
+        if(name == "bauerh"){
+            return bauerh;
+        }
+        if(name == "bauerm"){
+            return bauerm;
+        }
+        return -1
     }
 });
