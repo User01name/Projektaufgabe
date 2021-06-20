@@ -46,11 +46,11 @@ $(document).ready(() => {
                     splitMsgCounter++;
                 }
             }
-            if (splitMsg[0] === "h"&& host == false) {
+            if (splitMsg[0] === "h" && host == false) {
                 reverseArray();
             }
 
-            if (splitMsg[0] === "m"&& host == true) {
+            if (splitMsg[0] === "m" && host == true) {
                 reverseArray();
             }
             paint();
@@ -115,11 +115,11 @@ $(document).ready(() => {
     const koenig = '<img src="/public/source/figuren/Bauer.png" alt="img" />';
 
     const bauerm = '<img class="bauerm" src="/public/source/figuren/BauerWm.png" alt="img" />';
-  //  const turm = '<img src="/public/source/figuren/Turm.png" alt="img" />';
-   // const laeufer = '<img src="/public/source/figuren/Bauer.png" alt="img" />';
-   // const springer = '<img src="/public/source/figuren/Bauer.png" alt="img" />';
-   // const koenigin = '<img src="/public/source/figuren/Bauer.png" alt="img" />';
-   // const koenig = '<img src="/public/source/figuren/Bauer.png" alt="img" />';
+    //  const turm = '<img src="/public/source/figuren/Turm.png" alt="img" />';
+    // const laeufer = '<img src="/public/source/figuren/Bauer.png" alt="img" />';
+    // const springer = '<img src="/public/source/figuren/Bauer.png" alt="img" />';
+    // const koenigin = '<img src="/public/source/figuren/Bauer.png" alt="img" />';
+    // const koenig = '<img src="/public/source/figuren/Bauer.png" alt="img" />';
 
     const clickedOnFieldConst = 'clickedOnField(this)';
 
@@ -133,12 +133,12 @@ $(document).ready(() => {
         arrayIsCreated = true;
         for (i = 0; i < chessboardArray.length; i++) {
             chessboardArray[0][i] = "";
-            chessboardArray[1][i] =  bauerm;
+            chessboardArray[1][i] = bauerm;
             chessboardArray[2][i] = "";
             chessboardArray[3][i] = "";
             chessboardArray[4][i] = "";
             chessboardArray[5][i] = "";
-            chessboardArray[6][i] =  bauerh;
+            chessboardArray[6][i] = bauerh;
             chessboardArray[7][i] = "";
         }
         //   $("#create").disabled = true;
@@ -192,16 +192,19 @@ $(document).ready(() => {
 
 
     $("#chessboard").on("click", "img", function () { /// jqery befehl für den click
-var element = $(this);
-element = element.parent();
+        var element = $(this);
+        element = element.parent();
         var id = element.attr('id');
-      //  clickedOnField(element);
-       clickedOnField(document.getElementById(id));
+        //  clickedOnField(element);
+      //   clickedOnField(document.getElementById(id));
     });
     $("#chessboard").on("click", "td", function () { /// jqery befehl für den click
 
         var id = $(this).attr('id');
-     // clickedOnField(document.getElementById(id));
+        var color = $(this).attr('bgcolor') ;
+       
+            clickedOnField(document.getElementById(id));
+        
     });
 
     function clickedOnField(element) {
@@ -213,7 +216,7 @@ element = element.parent();
 
             tileId = element.id;
             tileColor = element.getAttribute("bgcolor");
-            tileContent =  element.firstChild.className;
+            tileContent = element.firstChild.className;
 
             document.getElementById(tileId).setAttribute("bgcolor", colorSelectedField);
             chesspieceSelected = true;
@@ -285,7 +288,9 @@ element = element.parent();
             chesspiecePreview = false;
             chesspieceSelected = false;
             // zurücksetzen der bewegten Figur
-            document.getElementById(tileId).textContent = tileContent;
+            if (tileContent = 'bauerh') {
+                document.getElementById(tileId).textContent = bauerh;
+            }
             document.getElementById(newTileId).textContent = newTileExistingContent;
             //zurücksetzen restlicher Variablen
             tileId = "";
@@ -298,7 +303,7 @@ element = element.parent();
 
     function check(chessboardArrayRow, chessboardArrayCol, endPosRow, endPosCol, figur) {
         if (chessboardArrayRow >= 0 && chessboardArrayCol >= 0 && endPosRow < 8 && endPosCol < 8) {
-            if (figur =='bauerh') {
+            if (figur == 'bauerh') {
                 if ((chessboardArrayRow - endPosRow) == 1 && chessboardArrayCol - endPosCol == 0) {
                     repaint(chessboardArrayRow, chessboardArrayCol, endPosRow, endPosCol, figur);
                 } else if ((chessboardArrayRow - endPosRow) == 2 && chessboardArrayCol - endPosCol == 0 && chessboardArrayRow == 6) {
