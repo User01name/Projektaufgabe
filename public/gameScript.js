@@ -1,19 +1,23 @@
-/* Zu erledigen:
-    - Siegbedingung (z.B. wenn ein bauer die andere Seite erreicht)
-    - Verschiedene Spieler, verschiedene Arrays
-        --> z.B. über eine Datenbank auf dem Server mit einer Spalte für die Spielernummer 
-        und einer Nummer die bei einem Spieler initial 1 und bei dem anderen 2 ist 
-        --> es darf immer nur der Spiler mit der Nummer 1 ziehen, beim Zugende tauschen sich die Nummern   
+/* Zu erledigen: 
+    - es darf immer nur ein Spiler ziehen
+    - welcher Spieler fängt an?
+    - erst chessboard erstellen, wenn 2 Spiler bereit sind? 
     - 2 Spielfigurenfarben --> zuordnung zu den Spielern und schmeißen nur möglich bei verschiedener Spielerfarbe
-    - Bilder anstatt Strings verwenden und ggf. größe der Bilder anpassen (element.textContent funktioniert glaub ich nicht --> vllt element.innerHTML?)
-    -Bauer darf nicht gerade schmeißen
     -für Spieler 2 board an der y-Achse speigeln
 */
 
 /* zuletzt hinzugefügt:
-    -Spielbrett wird bei allen im Raum synchronisiert;
+    -Bauernzüge fertig 
     -Fehlerbehebung
 */
+
+/* Lösungsvorschläge:
+    -Host fängt immer an 
+    --> neue "boolean" Variable hostsTurn --> wenn true, dann darf host ziehen und sie wird false und umgekehrt ()
+    const button = document. querySelector('button')
+        button. disabled = true.
+        button. disabled = false
+ */
 
 $(document).ready(() => {
     console.log("DOM is ready!");
@@ -225,28 +229,38 @@ $(document).ready(() => {
                     var countOfPossibleTurns = 0;
                     var idArr = tileId.split(",");
 
-                    idArr[0] = parseInt(idArr[0]); // Nur für den Spieler der unten ist sonst +1 todo...
+                    idArr[0] = parseInt(idArr[0]);
                     idArr[1] = parseInt(idArr[1]);
 
-                    if (idArr[0] !== 0) {
-                        idOfPossibleTurns[countOfPossibleTurns] = ((idArr[0] - 1) + "," + idArr[1]);
-                        countOfPossibleTurns++;
-                    }
+                    //wenn vor dem Bauer frei ist, dann kann er laufen
+                    if(chessboardArray[idArr[0]-1] [idArr[1]] != bauerh && chessboardArray[idArr[0]-1] [idArr[1]] != bauerm){
+                        if (idArr[0] !== 0) {
+                            idOfPossibleTurns[countOfPossibleTurns] = ((idArr[0] - 1) + "," + idArr[1]);
+                            countOfPossibleTurns++;
+                        }
 
-                    // wenn der Bauer auf der Startlinie ist, kann er sich 2 Felder weit bewegen
-                    if (idArr[0] === 6) {
-                        idOfPossibleTurns[countOfPossibleTurns] = ((idArr[0] - 2) + "," + idArr[1]);
-                        countOfPossibleTurns++;
+                        // wenn der Bauer auf der Startlinie ist, kann er sich 2 Felder weit bewegen                    
+                        if (idArr[0] === 6) {
+                            if(chessboardArray[idArr[0]-2] [idArr[1]] != bauerh && chessboardArray[idArr[0]-2] [idArr[1]] != bauerm){
+                                idOfPossibleTurns[countOfPossibleTurns] = ((idArr[0] - 2) + "," + idArr[1]);
+                                countOfPossibleTurns++;
+                            }
+                        }  
                     }
-                    // wenn diagonal zum Bauer eine Figur ist, dann kann er diese schmeißen
-                    if (chessboardArray[idArr[0] - 1][idArr[1] + 1] !== "" && idArr[1] !== 7) {
-                        idOfPossibleTurns[countOfPossibleTurns] = ((idArr[0] - 1) + "," + (idArr[1] + 1));
-                        countOfPossibleTurns++;
+                    // wenn diagonal zum Bauer eine Bauer einer anderen Farbe ist, dann kann er diese schmeißen
+                    if(chessboardArray[idArr[0]][idArr[1]] !== chessboardArray [idArr[0]-1] [idArr[1]+1]){
+                        if (chessboardArray[idArr[0] - 1][idArr[1] + 1] !== "" && idArr[1] !== 7) {
+                            idOfPossibleTurns[countOfPossibleTurns] = ((idArr[0] - 1) + "," + (idArr[1] + 1));
+                            countOfPossibleTurns++;
+                        }
                     }
-                    if (chessboardArray[idArr[0] - 1][idArr[1] - 1] !== "" && idArr[1] !== 0) {
-                        idOfPossibleTurns[countOfPossibleTurns] = ((idArr[0] - 1) + "," + (idArr[1] - 1));
-                        countOfPossibleTurns++;
+                    if(chessboardArray[idArr[0]][idArr[1]] !== chessboardArray [idArr[0]-1] [idArr[1]-1]){
+                        if (chessboardArray[idArr[0] - 1][idArr[1] - 1] !== "" && idArr[1] !== 0) {
+                            idOfPossibleTurns[countOfPossibleTurns] = ((idArr[0] - 1) + "," + (idArr[1] - 1));
+                            countOfPossibleTurns++;
+                        }
                     }
+                    
 
                     for (var i = 0; i < idOfPossibleTurns.length; i++) {
                         colorBeforePossibleTurns[i] = document.getElementById(idOfPossibleTurns[i]).getAttribute("bgcolor");
@@ -291,11 +305,12 @@ $(document).ready(() => {
             newTileId = "";
             newTileExistingContent = "";
         }
-
     }
 
+    //eigentlich doppelter Code  man könnt einmalig alle möglichen Züge wie oben anzeigen durch einfärebn und dann nur checken ob man auf ein eingefärbtes Feld drückt...
     function check(chessboardArrayRow, chessboardArrayCol, endPosRow, endPosCol, figur) {
-        if (chessboardArrayRow >= 0 && chessboardArrayCol >= 0 && endPosRow < 8 && endPosCol < 8) {
+        var thisId = endPosRow + "," + endPosCol;
+        if (chessboardArrayRow >= 0 && chessboardArrayCol >= 0 && endPosRow < 8 && endPosCol < 8 && document.getElementById(thisId).getAttribute("bgcolor") == "#7CC752" ) {
             if (figur == 'bauerh' || 'bauerm') {
                 if ((chessboardArrayRow - endPosRow) == 1 && chessboardArrayCol - endPosCol == 0) {
                     repaint(chessboardArrayRow, chessboardArrayCol, endPosRow, endPosCol, figur);
