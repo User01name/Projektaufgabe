@@ -1,6 +1,5 @@
 /* Zu erledigen: 
-    - es darf immer nur ein Spiler ziehen
-    - welcher Spieler fängt an?
+    
     - erst chessboard erstellen, wenn 2 Spiler bereit sind? 
     - 2 Spielfigurenfarben --> zuordnung zu den Spielern und schmeißen nur möglich bei verschiedener Spielerfarbe
     -für Spieler 2 board an der y-Achse speigeln
@@ -8,15 +7,13 @@
 
 /* zuletzt hinzugefügt:
     -Bauernzüge fertig 
-    -Fehlerbehebung
+    -Fehlerbehebun
+    - es darf immer nur ein Spiler ziehen
+    - welcher Spieler fängt an?
 */
 
 /* Lösungsvorschläge:
-    -Host fängt immer an 
-    --> neue "boolean" Variable hostsTurn --> wenn true, dann darf host ziehen und sie wird false und umgekehrt ()
-    const button = document. querySelector('button')
-        button. disabled = true.
-        button. disabled = false
+   
  */
 
 $(document).ready(() => {
@@ -24,16 +21,28 @@ $(document).ready(() => {
     var host = false;
     var chessboardArray = new Array(8);
     var arrayIsCreated = false;
-
+    var buttonDisabled = false;
+    var gameEnd = false;
+    var messageSend = false;
+    var victory = false;
+    var name ="";
     //Websocket:
     const socket = io();
     var roomDiv = document.getElementById('room');
     var arrayTransport = document.getElementById('array');
 
+    var user = document.cookie;
+    document.cookie= "";
+    document.cookie.split(";").forEach(function(c) { document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); });
 
     $('#messageForm').submit((event) => {
         event.preventDefault();
-        socket.emit('message', $('#m').val()); //verschicke eine Nachricht in den Message Kanal
+        if(user != ""){
+        socket.emit('message', user+ ": " + $('#m').val() ); //verschicke eine Nachricht in den Message Kanal
+        }
+        else{
+            socket.emit('message',  $('#m').val() );
+        }
         $('#m').val(''); //leeren des Inputfeldes
     });
     //Wenn auf dem Message Kanal was kommt dann ...
@@ -50,12 +59,36 @@ $(document).ready(() => {
                     splitMsgCounter++;
                 }
             }
+            if (splitMsg[0] === "v") {
+
+
+                checkVictory();
+                enable($('#create'));
+                enable($('#confirm'));
+
+            }
             if (splitMsg[0] === "h" && host == false) {
                 reverseArray();
+                enable($('#chessboard'));
+                enable($('#confirm'));
+
             }
 
             if (splitMsg[0] === "m" && host == true) {
                 reverseArray();
+                enable($('#chessboard'));
+                enable($('#confirm'));
+            }
+            if (splitMsg[0] === "h" && host == true) {
+
+                disable($('#chessboard'));
+
+            }
+
+            if (splitMsg[0] === "m" && host == false) {
+
+                disable($('#chessboard'));
+
             }
             paint();
         } else {
@@ -85,6 +118,7 @@ $(document).ready(() => {
         host = true;
         sendArray();
     });
+
     $("#undo").click(function () {
         undoSelection();
     });
@@ -92,10 +126,14 @@ $(document).ready(() => {
         updateBoard();
         checkVictory();
         sendArray();
+        disable($('#confirm'));
     });
     function sendArray() {
         var arrayAsString = "";
-        if (host) {
+        if (gameEnd) {
+            arrayAsString += "v,"
+        }
+        else if (host) {
             arrayAsString += "h,"
         }
         else {
@@ -200,15 +238,15 @@ $(document).ready(() => {
         element = element.parent();
         var id = element.attr('id');
         //  clickedOnField(element);
-      //   clickedOnField(document.getElementById(id));
+        //   clickedOnField(document.getElementById(id));
     });
     $("#chessboard").on("click", "td", function () { /// jqery befehl für den click
 
         var id = $(this).attr('id');
-        var color = $(this).attr('bgcolor') ;
-       
-            clickedOnField(document.getElementById(id));
-        
+        var color = $(this).attr('bgcolor');
+
+        clickedOnField(document.getElementById(id));
+
     });
 
     function clickedOnField(element) {
@@ -225,48 +263,48 @@ $(document).ready(() => {
             document.getElementById(tileId).setAttribute("bgcolor", colorSelectedField);
             chesspieceSelected = true;
 
-                if(tileContent == 'bauerh' || tileContent == 'bauerm'){
-                    var countOfPossibleTurns = 0;
-                    var idArr = tileId.split(",");
+            if (tileContent == 'bauerh' || tileContent == 'bauerm') {
+                var countOfPossibleTurns = 0;
+                var idArr = tileId.split(",");
 
-                    idArr[0] = parseInt(idArr[0]);
-                    idArr[1] = parseInt(idArr[1]);
+                idArr[0] = parseInt(idArr[0]);
+                idArr[1] = parseInt(idArr[1]);
 
-                    //wenn vor dem Bauer frei ist, dann kann er laufen
-                    if(chessboardArray[idArr[0]-1] [idArr[1]] != bauerh && chessboardArray[idArr[0]-1] [idArr[1]] != bauerm){
-                        if (idArr[0] !== 0) {
-                            idOfPossibleTurns[countOfPossibleTurns] = ((idArr[0] - 1) + "," + idArr[1]);
+                //wenn vor dem Bauer frei ist, dann kann er laufen
+                if (chessboardArray[idArr[0] - 1][idArr[1]] != bauerh && chessboardArray[idArr[0] - 1][idArr[1]] != bauerm) {
+                    if (idArr[0] !== 0) {
+                        idOfPossibleTurns[countOfPossibleTurns] = ((idArr[0] - 1) + "," + idArr[1]);
+                        countOfPossibleTurns++;
+                    }
+
+                    // wenn der Bauer auf der Startlinie ist, kann er sich 2 Felder weit bewegen                    
+                    if (idArr[0] === 6) {
+                        if (chessboardArray[idArr[0] - 2][idArr[1]] != bauerh && chessboardArray[idArr[0] - 2][idArr[1]] != bauerm) {
+                            idOfPossibleTurns[countOfPossibleTurns] = ((idArr[0] - 2) + "," + idArr[1]);
                             countOfPossibleTurns++;
                         }
-
-                        // wenn der Bauer auf der Startlinie ist, kann er sich 2 Felder weit bewegen                    
-                        if (idArr[0] === 6) {
-                            if(chessboardArray[idArr[0]-2] [idArr[1]] != bauerh && chessboardArray[idArr[0]-2] [idArr[1]] != bauerm){
-                                idOfPossibleTurns[countOfPossibleTurns] = ((idArr[0] - 2) + "," + idArr[1]);
-                                countOfPossibleTurns++;
-                            }
-                        }  
-                    }
-                    // wenn diagonal zum Bauer eine Bauer einer anderen Farbe ist, dann kann er diese schmeißen
-                    if(chessboardArray[idArr[0]][idArr[1]] !== chessboardArray [idArr[0]-1] [idArr[1]+1]){
-                        if (chessboardArray[idArr[0] - 1][idArr[1] + 1] !== "" && idArr[1] !== 7) {
-                            idOfPossibleTurns[countOfPossibleTurns] = ((idArr[0] - 1) + "," + (idArr[1] + 1));
-                            countOfPossibleTurns++;
-                        }
-                    }
-                    if(chessboardArray[idArr[0]][idArr[1]] !== chessboardArray [idArr[0]-1] [idArr[1]-1]){
-                        if (chessboardArray[idArr[0] - 1][idArr[1] - 1] !== "" && idArr[1] !== 0) {
-                            idOfPossibleTurns[countOfPossibleTurns] = ((idArr[0] - 1) + "," + (idArr[1] - 1));
-                            countOfPossibleTurns++;
-                        }
-                    }
-                    
-
-                    for (var i = 0; i < idOfPossibleTurns.length; i++) {
-                        colorBeforePossibleTurns[i] = document.getElementById(idOfPossibleTurns[i]).getAttribute("bgcolor");
-                        document.getElementById(idOfPossibleTurns[i]).setAttribute("bgcolor", colorOfPossibleTurn);
                     }
                 }
+                // wenn diagonal zum Bauer eine Bauer einer anderen Farbe ist, dann kann er diese schmeißen
+                if (chessboardArray[idArr[0]][idArr[1]] !== chessboardArray[idArr[0] - 1][idArr[1] + 1]) {
+                    if (chessboardArray[idArr[0] - 1][idArr[1] + 1] !== "" && idArr[1] !== 7) {
+                        idOfPossibleTurns[countOfPossibleTurns] = ((idArr[0] - 1) + "," + (idArr[1] + 1));
+                        countOfPossibleTurns++;
+                    }
+                }
+                if (chessboardArray[idArr[0]][idArr[1]] !== chessboardArray[idArr[0] - 1][idArr[1] - 1]) {
+                    if (chessboardArray[idArr[0] - 1][idArr[1] - 1] !== "" && idArr[1] !== 0) {
+                        idOfPossibleTurns[countOfPossibleTurns] = ((idArr[0] - 1) + "," + (idArr[1] - 1));
+                        countOfPossibleTurns++;
+                    }
+                }
+
+
+                for (var i = 0; i < idOfPossibleTurns.length; i++) {
+                    colorBeforePossibleTurns[i] = document.getElementById(idOfPossibleTurns[i]).getAttribute("bgcolor");
+                    document.getElementById(idOfPossibleTurns[i]).setAttribute("bgcolor", colorOfPossibleTurn);
+                }
+            }
         } else if (chesspieceSelected) {
             if (!chesspiecePreview) {
                 newTileId = element.id;
@@ -298,7 +336,7 @@ $(document).ready(() => {
             chesspiecePreview = false;
             chesspieceSelected = false;
             // zurücksetzen der bewegten Figur
-           paint();
+            paint();
             //zurücksetzen restlicher Variablen
             tileId = "";
             tileContent = "";
@@ -310,7 +348,7 @@ $(document).ready(() => {
     //eigentlich doppelter Code  man könnt einmalig alle möglichen Züge wie oben anzeigen durch einfärebn und dann nur checken ob man auf ein eingefärbtes Feld drückt...
     function check(chessboardArrayRow, chessboardArrayCol, endPosRow, endPosCol, figur) {
         var thisId = endPosRow + "," + endPosCol;
-        if (chessboardArrayRow >= 0 && chessboardArrayCol >= 0 && endPosRow < 8 && endPosCol < 8 && document.getElementById(thisId).getAttribute("bgcolor") == "#7CC752" ) {
+        if (chessboardArrayRow >= 0 && chessboardArrayCol >= 0 && endPosRow < 8 && endPosCol < 8 && document.getElementById(thisId).getAttribute("bgcolor") == "#7CC752") {
             if (figur == 'bauerh' || 'bauerm') {
                 if ((chessboardArrayRow - endPosRow) == 1 && chessboardArrayCol - endPosCol == 0) {
                     repaint(chessboardArrayRow, chessboardArrayCol, endPosRow, endPosCol, figur);
@@ -366,7 +404,7 @@ $(document).ready(() => {
 
         data = rows[endPosRow].getElementsByTagName('td');
         var a = getImgFromString(figur);
-            data[endPosCol].innerHTML = a;
+        data[endPosCol].innerHTML = a;
         chesspiecePreview = true;
     }
 
@@ -375,7 +413,7 @@ $(document).ready(() => {
             var idArrStartPos = tileId.split(",");
             var idArrEndPos = newTileId.split(",");
             chessboardArray[parseInt(idArrStartPos[0])][parseInt(idArrStartPos[1])] = "";
-            
+
             var test = getImgFromString(tileContent);
             chessboardArray[parseInt(idArrEndPos[0])][parseInt(idArrEndPos[1])] = test;
             undoSelection();
@@ -390,12 +428,31 @@ $(document).ready(() => {
     function checkVictory() {
         for (i = 0; i < chessboardArray.length; i++) {
             if (chessboardArray[0][i] != "" && chessboardArray[0][i] !== undefined) {
+
+                messageSend = true;
+
                 window.alert("Du hast gewonnen");
                 console.log("Du hast gewonnen");
+
+                victory = true;
+                gameEnd = true;
+                enable($('#create'));
+                enable($('#confirm'));
+                enable($('#chessboard'));
+
             }
             if (chessboardArray[7][i] != "" && chessboardArray[0][i] !== undefined) {
-                window.alert("Du hast verloren");
-                console.log("Du hast verloren");
+                if (!victory) {
+
+                    messageSend = true;
+                    window.alert("Du hast verloren");
+                    console.log("Du hast verloren");
+
+                    gameEnd = true;
+                    enable($('#create'));
+                    enable($('#confirm'));
+                    enable($('#chessboard'));
+                }
             }
             //   $('#create').disabled = false;
 
@@ -403,18 +460,28 @@ $(document).ready(() => {
     }
     function createChessboard() {
         //window.location = "/hostroom";
+        messageSend = false;
+        gameEnd = false;
         chesspieceSelected = false;
         chesspiecePreview = false;
         createStartArray();
         paint();
+        disable($('#create'));
+
     }
-    function getImgFromString(name){
-        if(name == "bauerh"){
+    function getImgFromString(name) {
+        if (name == "bauerh") {
             return bauerh;
         }
-        if(name == "bauerm"){
+        if (name == "bauerm") {
             return bauerm;
         }
         return -1
+    }
+    function disable(elm) {
+        elm.attr('disabled', 'disabled');
+    }
+    function enable(elm) {
+        elm.removeAttr('disabled');
     }
 });

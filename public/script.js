@@ -3,7 +3,8 @@ $(document).ready(() => {
         nickname: ""
     };
     $('#inputName').change(function () {
-        user.nickname = $('#inputName').val();
+        document.cookie = $('#inputName').val() ;
+        //user.nickname = $('#inputName').val();
     })
     //  user.nickname = read_cookie(user);
 
@@ -15,8 +16,14 @@ $(document).ready(() => {
         location.href = "/pages/chessboard";
     });
 
+    const a = $('a');
+
+    a.addEventListener('click', event => {
+        bake_cookie();
+    });
+
     function bake_cookie(name, value) {
-        var cookie = [name, '=', JSON.stringify(value), '; domain=.', window.location.host.toString(), '; path=/;'].join('');
+        var cookie = [name, '=', JSON.stringify(value), '; domain=.', location.host.toString(), '; path=/;'].join('');
         document.cookie = cookie;
     }
     function read_cookie(user) {
