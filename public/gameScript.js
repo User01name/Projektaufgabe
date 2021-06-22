@@ -25,23 +25,23 @@ $(document).ready(() => {
     var gameEnd = false;
     var messageSend = false;
     var victory = false;
-    var name ="";
+    var name = "";
     //Websocket:
     const socket = io();
     var roomDiv = document.getElementById('room');
     var arrayTransport = document.getElementById('array');
 
     var user = document.cookie;
-    document.cookie= "";
-    document.cookie.split(";").forEach(function(c) { document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); });
+    document.cookie = "";
+    document.cookie.split(";").forEach(function (c) { document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); });
 
     $('#messageForm').submit((event) => {
         event.preventDefault();
-        if(user != ""){
-        socket.emit('message', user+ ": " + $('#m').val() ); //verschicke eine Nachricht in den Message Kanal
+        if (user != "") {
+            socket.emit('message', user + ": " + $('#m').val()); //verschicke eine Nachricht in den Message Kanal
         }
-        else{
-            socket.emit('message',  $('#m').val() );
+        else {
+            socket.emit('message', $('#m').val());
         }
         $('#m').val(''); //leeren des Inputfeldes
     });
@@ -244,8 +244,14 @@ $(document).ready(() => {
 
         var id = $(this).attr('id');
         var color = $(this).attr('bgcolor');
-
-        clickedOnField(document.getElementById(id));
+        var element = document.getElementById(id);
+        if (element.firstChild != null &&((element.firstChild.className == "bauerh" && host) || (element.firstChild.className == "bauerm" && host == false))) {
+            clickedOnField(document.getElementById(id));
+        }
+        else if (selectedId != "") {
+            selectedId = "";
+            clickedOnField(document.getElementById(id));
+        }
 
     });
 
