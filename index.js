@@ -35,7 +35,7 @@ io.on('connection', function(socket){
     });
 
     socket.on('message', function(msg){
-      console.log(`Message: ${msg} in Room: ${room}`);
+     // console.log(`Message: ${msg} in Room: ${room}`);
       io.sockets.in(room).emit('message', msg); // nur an alle die in dem Raum sind wird die message über den message kanal geschickt
     });
 

@@ -60,7 +60,8 @@ $(document).ready(() => {
                 }
             }
             if (splitMsg[0] === "v") {
-
+                
+              
 
                 checkVictory();
                 enable($('#create'));
@@ -71,6 +72,9 @@ $(document).ready(() => {
                 reverseArray();
                 enable($('#chessboard'));
                 enable($('#confirm'));
+                 if (user != "") {
+                    socket.emit('message', user + " Ist am Zug"); 
+                }
 
             }
 
@@ -78,6 +82,9 @@ $(document).ready(() => {
                 reverseArray();
                 enable($('#chessboard'));
                 enable($('#confirm'));
+                if (user != "") {
+                    socket.emit('message', user + " Ist am Zug"); 
+                }
             }
             if (splitMsg[0] === "h" && host == true) {
 
@@ -92,7 +99,7 @@ $(document).ready(() => {
             }
             paint();
         } else {
-            $('#messages').append($('<p>').text("-" + msg));
+            $('#messages').prepend($('<p>').text("-" + msg));
         }
     });
 
@@ -110,7 +117,7 @@ $(document).ready(() => {
     socket.on('room', function (msg) { //wenn man eine Nachricht von dem room kanal bekommt ...
         $('#room').html($('<h3>').text("Room: " + msg));//ändere den Text
         $('#messages').empty();
-        $('#messages').append($('<h2>').text("Chat"));
+       // $('#messages').prepend($('<h2>').text("Chat"));
     });
 
     $("#create").click(function () {
