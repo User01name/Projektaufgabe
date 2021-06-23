@@ -255,8 +255,13 @@ $(document).ready(() => {
         if (element.firstChild != null &&((element.firstChild.className == "bauerh" && host) || (element.firstChild.className == "bauerm" && host == false))) {
             clickedOnField(document.getElementById(id));
         }
-        else if (selectedId != "") {
-            selectedId = "";
+        else if (element.firstChild != null && element.bgColor =='#7CC752'  &&((element.firstChild.className == "bauerm" && host) || (element.firstChild.className == "bauerh" && host == false))) {
+            clickedOnField(document.getElementById(id));
+        }
+       else if (element.firstChild == null ) {
+            clickedOnField(document.getElementById(id));
+        }
+        else if(element.nodeName == "TD" && element.color == '#7CC7FF'){
             clickedOnField(document.getElementById(id));
         }
 
